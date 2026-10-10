@@ -1,0 +1,25 @@
+name: Build Android APK
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install system dependencies
+        run: | sudo apt-get update sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev       - name: Install Buildozer
+        run: pip install --user --upgrade buildozer
+      - name: Build debug APK
+        working-directory: TITAN_ANDROID_LLL
+        run: ~/.local/bin/buildozer -v android debug
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TITAN-PRO-debug-APK
+          path: TITAN_ANDROID_LLL/bin/*.apk
+          if-no-files-found: error
